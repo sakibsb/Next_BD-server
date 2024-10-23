@@ -22,6 +22,7 @@ const updateAddToCart = require('../controller/updateAddToCart')
 const deleteAddToCartProduct = require('../models/delAddToCartPdt')
 const searchProduct = require('../controller/searchProduct')
 const filterController = require('../controller/filterProduct')
+const { getPymentLink } = require('../controller/payment')
 
 
 
@@ -39,7 +40,7 @@ router.post("/update-user", authToken, updateUser)
 router.post("/upload-product", authToken, UploadProductController)
 router.get("/get-product", getProductController)
 router.post("/update-product", authToken, updateProductController)
-router.get("/get-categoryProduct",getCategoryProduct)
+router.get("/get-categoryProduct", getCategoryProduct)
 
 //categorywise upload in user end
 router.post("/category-Product", getCategoryWiseProduct)
@@ -53,7 +54,7 @@ router.get("/countAddToCart", authToken, countAddToCart)
 router.get("/cart-product-view", authToken, addToCartViewProduct)
 
 //Update add to cart product
-router.post("/update", authToken , updateAddToCart)
+router.post("/update", authToken, updateAddToCart)
 // Delete from cart 
 router.post("/delete", authToken, deleteAddToCartProduct)
 //Search Product
@@ -61,7 +62,8 @@ router.get("/search", searchProduct)
 //Filter Product 
 router.post("/filter-product", filterController)
 
-
+// payment routes
+router.post('/get-payment-link', getPymentLink)
 
 
 module.exports = router

@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 async function userSignInController(req, res) {
     try {
-        console.log("Received request to sign in:", req.body);
 
         const { email, password } = req.body;
 
@@ -25,8 +24,6 @@ async function userSignInController(req, res) {
         }
 
         const checkPassword = await bcrypt.compare(password, user.password);
-
-        console.log("Password comparison result:", checkPassword);
 
         if (checkPassword) {
             const tokenData = {
