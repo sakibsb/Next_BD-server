@@ -23,6 +23,7 @@ const deleteAddToCartProduct = require('../models/delAddToCartPdt')
 const searchProduct = require('../controller/searchProduct')
 const filterController = require('../controller/filterProduct')
 const { getPymentLink } = require('../controller/payment')
+const getProductPriceRangeController = require('../controller/productPriceRange')
 
 
 
@@ -46,6 +47,9 @@ router.get("/get-categoryProduct", getCategoryProduct)
 router.post("/category-Product", getCategoryWiseProduct)
 //product detail
 router.post("/product-details", getProductDetails)
+
+// price range
+router.get("/price-range/:category", getProductPriceRangeController)
 
 //Add To Cart
 
