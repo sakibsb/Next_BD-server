@@ -12,6 +12,7 @@ const getProductPriceRangeController = async (req, res) => {
             success: true,
             error: false,
             data: {
+                categoryName: category,
                 minPrice: minPriceProduct.price,
                 maxPrice: maxPriceProduct.price
             }
