@@ -12,8 +12,8 @@ const getPymentLink = async (req, res) => {
             total_amount: info.amount,
             currency: 'BDT',
             tran_id: crypto.randomUUID(), // use unique tran_id for each api call
-            success_url: 'http://localhost:3030/success',
-            fail_url: 'http://localhost:3030/fail',
+            success_url: 'http://localhost:3000/cart',
+            fail_url: 'http://localhost:3000/fail',
             cancel_url: 'http://localhost:3030/cancel',
             ipn_url: 'http://localhost:3030/ipn',
             shipping_method: 'Courier',

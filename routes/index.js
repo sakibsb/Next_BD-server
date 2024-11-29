@@ -27,6 +27,8 @@ const getProductPriceRangeController = require('../controller/productPriceRange'
 
 
 
+const sellerRoutes = require('./sellerRoutes'); // Correct relative path
+router.use('/sellers', sellerRoutes);
 
 router.post("/signup", userSignUpController)
 router.post("/signin", userSignInController)
@@ -35,7 +37,10 @@ router.get("/userLogout", userLogout)
 
 //admin-panel
 router.get("/all-user", authToken, allUsers)
+
 router.post("/update-user", authToken, updateUser)
+
+
 
 //upload product
 router.post("/upload-product", authToken, UploadProductController)
