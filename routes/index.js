@@ -27,8 +27,7 @@ const getProductPriceRangeController = require('../controller/productPriceRange'
 
 
 
-const sellerRoutes = require('./sellerRoutes'); // Correct relative path
-router.use('/sellers', sellerRoutes);
+
 
 router.post("/signup", userSignUpController)
 router.post("/signin", userSignInController)
