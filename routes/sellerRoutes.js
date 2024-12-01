@@ -1,59 +1,78 @@
+// sellerRoutes.js
 const express = require('express');
-const SellerRequest = require('../models/sellerRequest'); // Import the SellerRequest model
-
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
+const SellerRequest = require('../models/sellerRequest');
 
-// Route to submit a seller request
-router.post('/become-seller', async (req, res) => {
-    const { name, email, phone, address } = req.body;
 
-    if (!name || !email || !phone || !address) {
-        return res.status(400).json({ message: 'All fields are required.' });
+// Create a seller request
+router.post(
+    '/become-seller',
+    [
+        body('name').trim().notEmpty().withMessage('Name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('phone').isLength({ min: 10 }).withMessage('Phone number must have at least 10 digits'),
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { name, email, phone } = req.body;
+
+        try {
+            // Check if the email already exists
+            const existingRequest = await SellerRequest.findOne({ email });
+            if (existingRequest) {
+                return res.status(409).json({ message: 'A request with this email already exists' });
+            }
+
+            const sellerRequest = new SellerRequest({ name, email, phone });
+            await sellerRequest.save();
+            res.status(201).json({ message: 'Seller request submitted successfully!' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
+);
 
+// Get all seller requests (admin use)
+router.get('/seller-requests', async (req, res) => {
     try {
-        const newRequest = new SellerRequest({ name, email, phone, address });
-        await newRequest.save();
-        return res.status(201).json({ message: 'Seller request submitted successfully.' });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Failed to submit seller request.', error: error.message });
+        const sellerRequests = await SellerRequest.find();
+        res.status(200).json(sellerRequests);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Route for admin to view all requests
-router.get('/requests', async (req, res) => {
-    try {
-        const requests = await SellerRequest.find(); // Fetch all seller requests
-        return res.status(200).json(requests);
-    } catch (error) {
-        console.error(error); // Log error for debugging
-        return res.status(500).json({ message: 'Failed to fetch requests.', error: error.message });
-    }
-});
-
-// Route for admin to approve/reject a request
-router.patch('/requests/:id', async (req, res) => {
+// Approve or reject seller requests
+router.patch('/seller-requests/:id', async (req, res) => {
     const { status } = req.body;
 
-    // Validate status input (optional)
-    if (!status || !['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ message: 'Invalid status value. Must be "approved" or "rejected".' });
+    // Validate status
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status value' });
     }
 
     try {
-        const updatedRequest = await SellerRequest.findByIdAndUpdate(
-            req.params.id, // Find the seller request by ID
-            { status }, // Update the status
-            { new: true } // Return the updated document
+        const sellerRequest = await SellerRequest.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true, runValidators: true }
         );
-        if (!updatedRequest) {
-            return res.status(404).json({ message: 'Seller request not found.' });
+
+        if (!sellerRequest) {
+            return res.status(404).json({ message: 'Seller request not found' });
         }
-        return res.status(200).json(updatedRequest); // Return the updated request
-    } catch (error) {
-        console.error(error); // Log error for debugging
-        return res.status(500).json({ message: 'Failed to update request status.', error: error.message });
+
+        res.status(200).json({ message: `Request ${status}`, data: sellerRequest });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
