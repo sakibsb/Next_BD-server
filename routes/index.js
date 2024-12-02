@@ -22,12 +22,20 @@ const updateAddToCart = require('../controller/updateAddToCart')
 const deleteAddToCartProduct = require('../models/delAddToCartPdt')
 const searchProduct = require('../controller/searchProduct')
 const filterController = require('../controller/filterProduct')
-const { getPymentLink } = require('../controller/payment')
+//const { getPymentLink } = require('../controller/payment')
 const getProductPriceRangeController = require('../controller/productPriceRange')
 
 
 
 const sellerRoutes = require('./sellerRoutes'); // Correct relative path
+
+const webhooks = require('../controller/order/webhook')
+const orderController = require('../controller/order/order.controller')
+const allOrderController = require('../controller/order/allOrder.controller')
+const paymentController = require('../controller/order/paymentController')
+
+
+
 router.use('/sellers', sellerRoutes);
 
 router.post("/signup", userSignUpController)
@@ -72,7 +80,12 @@ router.get("/search", searchProduct)
 router.post("/filter-product", filterController)
 
 // payment routes
-router.post('/get-payment-link', getPymentLink)
+//router.post('/get-payment-link', getPymentLink)
 
+//payment and order
+router.post('/checkout', authToken, paymentController)
+router.post('/webhook', webhooks) // /api/webhook
+router.get("/order-list", authToken, orderController)
+router.get("/all-order", authToken, allOrderController)
 
 module.exports = router
